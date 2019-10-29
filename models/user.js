@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
 
-var mongoDBUri = process.env.MONGODB_LOCAL_URI;
+var mongoDBUri = process.env.MONGODB_PROD_URI || process.env.MONGODB_LOCAL_URI;
+
 console.log('mongo: ' + mongoDBUri.toString());
 
 const schema = mongoose.Schema({
