@@ -1,0 +1,33 @@
+version: '3'
+services:
+  app:
+    build:    
+      context: .
+      dockerfile: Dockerfile
+    image: noir_nodejs_12
+    container_name: nodejs
+    restart: unless-stopped
+    command: "node app.js"
+    environment:
+     - MONGODB_PROD_URI=${MONGODB_URI}
+     - MONGODB_LOCAL_URI=mongodb://mongo:27017/test
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+
+  mongo:
+    image: "mongo"
+    container_name: mongo
+
+  nginx:
+    image: "nginx"
+    container_name: nginx
+    volumes: 
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./static_files:/var/www
+    ports: 
+     - 80:80
+     - 443:443
+    depends_on:
+      - app
