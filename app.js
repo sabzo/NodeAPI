@@ -17,6 +17,8 @@ app.set('port', process.env.port || 8080);
 // mongoose-session
 app.use(session({
     secret: '10$nf2EmFNb3GLK',
+    resave: false,
+    saveUninitialized: false,
     store: new MongoStore({ 
          mongooseConnection: db, 
          ttl: 14 * 24 * 60 * 60
