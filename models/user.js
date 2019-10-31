@@ -17,7 +17,7 @@ const schema = mongoose.Schema({
 
 schema.methods.newAuthToken = async function() {
     const user  = this
-    const token =  jwt.sign({ _id: user.id.toString() },'a-secret', {expiresIn: "14d"})
+    const token =  jwt.sign({ _id: user.id.toString() }, process.env.JWTSECRET, {expiresIn: "14d"})
     user.token = token;
     await user.save()
     return token

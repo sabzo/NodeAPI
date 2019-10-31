@@ -26,12 +26,13 @@ The static files are served through Nginx and Nginx proxies all requests to Expr
 ### Usage:
 
 * Install [Docker]()
+* Set environment variables defined in `docker-compose.yml`
 * Build app: `sudo -E docker-compose --build` 
 
 ### Testing
 * http api route testing: [httpie](https://github.com/teracyhq/httpie-jwt-auth) library with authentication plugin for JWT.
 ### TODO
-* TODO: 
+* TODO: [Securing JWT Tokens](https://medium.com/@siddharthac6/json-web-token-jwt-the-right-way-of-implementing-with-node-js-65b8915d550e)
 * TODO: [ssl](https://www.digitalocean.com/community/tutorials/how-to-secure-a-containerized-node-js-application-with-nginx-let-s-encrypt-and-docker-compose#step-3-%E2%80%94-creating-the-docker-compose-file)
 
 

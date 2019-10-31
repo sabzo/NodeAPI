@@ -11,6 +11,8 @@ services:
     environment:
      - MONGODB_PROD_URI=${MONGODB_URI}
      - MONGODB_LOCAL_URI=mongodb://mongo:27017/test
+     - JWTSECRET=${JWTSECRET}
+     - SESSION_SECRET=${SESSION_SECRET}
     ports:
       - "8080:8080"
     depends_on:

@@ -9,7 +9,7 @@ module.exports = async function(token) {
   }
   // is token still valid?
   try {
-    jwt.verify(token, 'a-secret', function(err, decoded){
+    jwt.verify(token, process.env.JWTSECRET, function(err, decoded){
       if(err) { 
          console.log(err);  
          return false;
