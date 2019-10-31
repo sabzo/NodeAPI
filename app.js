@@ -1,7 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose'); // communicate to mongo
-const Bcrypt = require('bcryptjs'); // password encryption
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session); //store login session in mongodb
 
