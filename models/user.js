@@ -9,13 +9,8 @@ const schema = mongoose.Schema({
   firstName: String,
   lastName: String,
   email: String,
-  password: String,
-  tokens:[{
-        token:{
-            type:String,
-            required: true
-        }
-    }],
+  password: {type:String, required: true},
+  token: String,
   }, 
   { timestamps: true
 });
@@ -23,9 +18,11 @@ const schema = mongoose.Schema({
 schema.methods.newAuthToken = async function() {
     const user  = this
     const token =  jwt.sign({ _id: user.id.toString() },'a-secret', {expiresIn: "14d"})
-    user.tokens = user.tokens.concat({ token })
+    user.token = token;
     await user.save()
     return token
 }
+
+
 module.exports = mongoose.model('User', schema, 'users');
    
