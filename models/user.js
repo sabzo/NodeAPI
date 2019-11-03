@@ -31,6 +31,4 @@ schema.methods.getProfile = function() {
   };
 }
 
-
 module.exports = mongoose.model('User', schema, 'users');
-   

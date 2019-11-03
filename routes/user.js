@@ -26,11 +26,24 @@ router.get('/user/:id', async (req, res) => {
   }
 });
 
-router.get('/user/all', (req, res) => {
-  User.find(function(err, users) {
-    console.log(users);  
-  });
-  res.json({ok: 200});  
+router.get('/users', (req, res) => {
+  const token = getToken(req.headers.authorization);
+  var authenticated = verifyToken(token); 
+  if (authenticated) {
+  User.find({}, 'id firstName lastName', function(err, users) {
+      if(err) {
+        return res.status(404).send({message: 'user not found'});  
+      } else { 
+        result = [];
+        users.forEach(function(u) {
+          result.push(u.getProfile());  
+        });
+        return res.status(200).send(result);
+      }
+    }); 
+  } else {
+    return res.status(401).send({message: 'unauthorized'}); 
+  }
 });
 
 router.post('/user', async (req, res) => {
