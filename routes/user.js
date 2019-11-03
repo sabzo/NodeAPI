@@ -3,14 +3,14 @@ const router = new express.Router();
 const bcrypt = require('bcrypt')
 const User = require('../models/user');
 const verifyToken = require('../token.js');
+const { check, validationResult } = require('express-validator');
 
 function getToken(req) {
- return req.replace('Bearer ', '')
+  return req == undefined || req.replace('Bearer ', '');
 }
 
 router.get('/user/:id', async (req, res) => {
   const token = getToken(req.headers.authorization);
-  console.log('token is: ' + token);
   // is this an authenticated request
   var authenticated = await verifyToken(token); 
   if (authenticated) {
@@ -26,9 +26,10 @@ router.get('/user/:id', async (req, res) => {
   }
 });
 
-router.get('/users', (req, res) => {
+router.get('/users', async (req, res) => {
   const token = getToken(req.headers.authorization);
-  var authenticated = verifyToken(token); 
+  var authenticated = await verifyToken(token); 
+  console.log('authenticated', authenticated);
   if (authenticated) {
   User.find({}, 'id firstName lastName', function(err, users) {
       if(err) {
@@ -80,5 +81,27 @@ router.post("/user/login", async (req, res) => {
  
 });
 
-module.exports = router
+router.post("/user/invite", [
+  check('email').isEmail()
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
+  const token = getToken(req.headers.authorization);    
+  var authenticated = await verifyToken(token); 
+  if (authenticated) {
+  User.save(email: req.body.email, function(err, user) {
+      if(err) {
+        return res.status(404).send({message: 'Unable to invite user'});  
+      } else { 
+        // TODO send email
+        return res.status(200).send({});
+      }
+    }); 
+  } else {
+    return res.status(401).send({message: 'unauthorized'}); 
+  }
+});
 
+module.exports = router
