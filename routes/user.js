@@ -8,14 +8,19 @@ function getToken(req) {
  return req.replace('Bearer ', '')
 }
 
-router.get('/user', async (req, res) => {
+router.get('/user/:id', async (req, res) => {
   const token = getToken(req.headers.authorization);
   console.log('token is: ' + token);
-  var user = new User();
-  var _status = await verifyToken(token); 
-  console.log('status: ' + _status);
-  if (_status) {
-    return res.status(200).send({});
+  // is this an authenticated request
+  var authenticated = await verifyToken(token); 
+  if (authenticated) {
+    User.findOne({_id: req.params.id}, function(err, user) {
+      if(err) {
+        return res.status(404).send({message: 'user not found'});  
+      } else { 
+        return res.status(200).send(user.getProfile());
+      }
+    }); 
   } else {
     return res.status(401).send({message: 'unauthorized'}); 
   }

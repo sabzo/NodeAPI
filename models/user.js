@@ -23,6 +23,14 @@ schema.methods.newAuthToken = async function() {
     return token
 }
 
+schema.methods.getProfile = function() {
+  return {
+    id: this._id,
+    firstName: this.firstName,
+    lastName: this.lastName,
+  };
+}
+
 
 module.exports = mongoose.model('User', schema, 'users');
    
