@@ -12,7 +12,7 @@ module.exports = async function(token) {
     jwt.verify(token, process.env.JWTSECRET, function(err, decoded){
       if(err) { 
          console.log(err);  
-         return false;
+         throw err;
       }
     });
     // does token belong to user?
@@ -20,7 +20,7 @@ module.exports = async function(token) {
     console.log(u);
     return (u.token == token); 
   } catch(e) {
-    console.log(e);
+    console.log('Error', e);
     return false;
   }
 }
