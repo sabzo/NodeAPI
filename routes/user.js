@@ -4,6 +4,10 @@ const bcrypt = require('bcrypt')
 const User = require('../models/user');
 const verifyToken = require('../token.js');
 const { check, validationResult } = require('express-validator');
+const shortid = require('shortid');
+const sgMail = require('@sendgrid/mail');
+
+sgMail.setApiKey(process.env.SENDGRID_EMAIL_KEY);
 
 function getToken(req) {
   return req == undefined || req.replace('Bearer ', '');
@@ -91,17 +95,50 @@ router.post("/user/invite", [
   const token = getToken(req.headers.authorization);    
   var authenticated = await verifyToken(token); 
   if (authenticated) {
-  User.save(email: req.body.email, function(err, user) {
-      if(err) {
-        return res.status(404).send({message: 'Unable to invite user'});  
-      } else { 
+        const inviteID = shortid.generate();
         // TODO send email
+        const companyName = process.env.COMPANY_NAME;
+        const text = companyName + ': Please activate  your account. <a href="' + 
+          process.env.HOST + '?inviteID=' + inviteID + '">' + companyName + '</a>';
+        const msg = {
+          to: req.body.email,
+          from: process.env.SENDGRID_EMAIL_ADDRESS,
+          subject: companyName + ': Active your account',
+          text: text,
+          html: 'Hi! You have a pending invite request. <strong>' + text + '</strong>',
+        };
+       sgMail.send(msg);
         return res.status(200).send({});
-      }
-    }); 
-  } else {
+      } else {
     return res.status(401).send({message: 'unauthorized'}); 
   }
+});
+
+router.post("/user/from_invite", [
+  check('email').isEmail(),
+  check('inviteID').isLength({ min: 7 })
+], (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
+  const inviteID = req.headers.inviteID;
+  const email = req.headers.email;
+
+  user = User.findOne({inviteID: inviteID, email: email}, function(error, u) {
+    if(err) {
+       return res.status(404).send({message: 'Invalid invite link'});  
+     } else { 
+       // update user
+       u.firstName = req.body.firstName;
+       u.lastName = req.body.lastName;
+       u.password = req.body.password;
+       u.inviteID = true;
+       u.save();
+
+       return res.status(200).send({});
+     }
+  });
 });
 
 module.exports = router
