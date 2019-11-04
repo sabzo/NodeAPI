@@ -13,6 +13,10 @@ services:
      - MONGODB_LOCAL_URI=mongodb://mongo:27017/test
      - JWTSECRET=${JWTSECRET}
      - SESSION_SECRET=${SESSION_SECRET}
+     - SENDGRID_EMAIL_KEY=${SENDGRID_EMAIL_KEY}
+     - SENDGRID_EMAIL_ADDRESS=${SENDGRID_EMAIL_ADDRESS}
+     - COMPANY_NAME=${COMPANY_NAME}
+     - HOST=${HOST}
     ports:
       - "8080:8080"
     depends_on:
