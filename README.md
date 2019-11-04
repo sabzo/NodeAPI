@@ -40,7 +40,10 @@ The static files are served through Nginx and Nginx proxies all requests to Expr
 * Create a user
   * `http post 0.0.0.0/api/user/ email=email@example.com firstName=name1 password=password lastName=name2`
 * Invite User by email addres:
-  * `http --auth-type=jwt --auth=$token post 0.0.0.0/api/user/invite email1@example.com`
+  * `http --auth-type=jwt --auth=$token post 0.0.0.0/api/user/invite email=email@example.comI`
+* Create user from invite 
+  * `http post 0.0.0.0/api/user/from_invite email=ownrepublic@gmail.com 
+     inviteID=<invite-id> firstName=<name1> lastName=<name2> password=<password>`
 * Retrieve a user
   * `http --auth-type=jwt --auth=$token get 0.0.0.0/api/user/<userid>`
 * Retrieve all users
