@@ -51,8 +51,15 @@ router.get('/users', async (req, res) => {
   }
 });
 
-router.post('/user', async (req, res) => {
-  console.log(req);
+router.post('/user', [ 
+   check('firstName').exists(),
+   check('lastName').exists(),
+   check('password').exists()
+  ], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
   req.body.password = bcrypt.hashSync(req.body.password, 10);
   var exists = await User.findOne({ email: req.body.email}).exec(); 
   if (exists) return res.status(400).send({message : "That email exists"});
@@ -71,7 +78,6 @@ router.post("/user/login", async (req, res) => {
         if(!user) {
             return res.status(400).send({ message: "The email does not exist" });
         }
-        console.log(user);
         const token = await user.newAuthToken();       
         if(await bcrypt.compare(req.body.password, user.password)) {
             return res.status(200).send({ message: "success",
@@ -95,48 +101,69 @@ router.post("/user/invite", [
   const token = getToken(req.headers.authorization);    
   var authenticated = await verifyToken(token); 
   if (authenticated) {
-        const inviteID = shortid.generate();
-        // TODO send email
-        const companyName = process.env.COMPANY_NAME;
-        const text = companyName + ': Please activate  your account. <a href="' + 
-          process.env.HOST + '?inviteID=' + inviteID + '">' + companyName + '</a>';
-        const msg = {
-          to: req.body.email,
-          from: process.env.SENDGRID_EMAIL_ADDRESS,
-          subject: companyName + ': Active your account',
-          text: text,
-          html: 'Hi! You have a pending invite request. <strong>' + text + '</strong>',
-        };
-       sgMail.send(msg);
-        return res.status(200).send({});
+    // check if user account already exists or if user has been invited
+    User.findOne({email: req.body.email}, function(err, user) {
+      if (err) {
+        console.log(err);
+        return res.status(400).send({ message: "unable to find user" }); 
       } else {
-    return res.status(401).send({message: 'unauthorized'}); 
+        if (!user) {
+          const inviteID = shortid.generate();
+          const randomPassword = shortid.generate();
+          user = new User({email: req.body.email, inviteID: inviteID, password: randomPassword});
+          user.save();
+          const companyName = process.env.COMPANY_NAME;
+          const text = companyName + ': Please activate  your account. <a href="' + 
+          process.env.HOST + '?inviteID=' + inviteID + '">' + companyName + '</a>';
+          const msg = {
+            to: req.body.email,
+            from: process.env.SENDGRID_EMAIL_ADDRESS,
+            subject: companyName + ': Active your account',
+            text: text,
+            html: 'Hi! You have a pending invite request. <strong>' + text + '</strong>',
+          };
+         sgMail.send(msg);
+         return res.status(200).send();
+        } else {
+          return res.status(400).send({ message: "Email already invited or exists" }); 
+        }
+        
+      }
+    }); 
+    } else {
+      return res.status(401).send({message: 'unauthorized'}); 
   }
 });
 
 router.post("/user/from_invite", [
   check('email').isEmail(),
-  check('inviteID').isLength({ min: 7 })
+  check('inviteID').isLength({ min: 7 }),
+  check('firstName').exists(),
+  check('lastName').exists(),
+  check('password').exists(),
+  check('inviteID').exists()
 ], (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() });
   }
-  const inviteID = req.headers.inviteID;
-  const email = req.headers.email;
+  const inviteID = req.body.inviteID;
+  const email = req.body.email;
 
-  user = User.findOne({inviteID: inviteID, email: email}, function(error, u) {
-    if(err) {
+  user = User.findOne({inviteID: inviteID, email: email}, function(err, u) {
+    if (err || !u) {
+       console.log(err);
+       console.log(u);
        return res.status(404).send({message: 'Invalid invite link'});  
      } else { 
        // update user
        u.firstName = req.body.firstName;
        u.lastName = req.body.lastName;
        u.password = req.body.password;
-       u.inviteID = true;
+       u.inviteID = null;
+       u.invited = true;
        u.save();
-
-       return res.status(200).send({});
+       return res.status(200).send();
      }
   });
 });

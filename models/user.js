@@ -11,6 +11,8 @@ const schema = mongoose.Schema({
   email: String,
   password: {type:String, required: true},
   token: String,
+  inviteID: String,
+  invited: Boolean,
   }, 
   { timestamps: true
 });
