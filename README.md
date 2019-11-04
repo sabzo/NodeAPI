@@ -7,6 +7,7 @@ The static files are served through Nginx and Nginx proxies all requests to Expr
 * [x] Sets up Nginx as a reverse proxy to the node app.
 * [x] Sets up minimal Node express framework
 * [x] Creates user registration
+* [x] Create users through invite link
 * [x] Sets up user authentication using [JSON Web Tokens](https://github.com/auth0/node-jsonwebtoken) using the Bearer Authorization strategy. 
 * [x] Connects node app to either local MongoDB database or a remote MongoDB database using a connection string.
 
@@ -30,9 +31,19 @@ The static files are served through Nginx and Nginx proxies all requests to Expr
 * Build app: `sudo -E docker-compose --build` 
 
 ### Testing
-* http api route testing: [httpie](https://github.com/teracyhq/httpie-jwt-auth) library with authentication plugin for JWT.
+* `http` api route testing: [httpie](https://github.com/teracyhq/httpie-jwt-auth) library with authentication plugin for JWT.
 ### TODO
 * TODO: [Securing JWT Tokens](https://medium.com/@siddharthac6/json-web-token-jwt-the-right-way-of-implementing-with-node-js-65b8915d550e)
 * TODO: [ssl](https://www.digitalocean.com/community/tutorials/how-to-secure-a-containerized-node-js-application-with-nginx-let-s-encrypt-and-docker-compose#step-3-%E2%80%94-creating-the-docker-compose-file)
 
-
+### Routes
+* Create a user
+  * `http post 0.0.0.0/api/user/ email=email@example.com firstName=name1 password=password lastName=name2`
+* Invite User by email addres:
+  * `http --auth-type=jwt --auth=$token post 0.0.0.0/api/user/invite email1@example.com`
+* Retrieve a user
+  * `http --auth-type=jwt --auth=$token get 0.0.0.0/api/user/<userid>`
+* Retrieve all users
+  * `http --auth-type=jwt --auth=$token get 0.0.0.0/api/users`
+* Login 
+  * `http post 0.0.0.0/api/user/login email=email@example.com password=password`

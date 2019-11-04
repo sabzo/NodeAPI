@@ -113,14 +113,14 @@ router.post("/user/invite", [
           user = new User({email: req.body.email, inviteID: inviteID, password: randomPassword});
           user.save();
           const companyName = process.env.COMPANY_NAME;
-          const text = companyName + ': Please activate  your account. <a href="' + 
-          process.env.HOST + '?inviteID=' + inviteID + '">' + companyName + '</a>';
+          const text = ': Click <a href="' + 
+          process.env.HOST + '?inviteID=' + inviteID + '"> here </a> to activate  your ' +  companyName + ' account';
           const msg = {
             to: req.body.email,
             from: process.env.SENDGRID_EMAIL_ADDRESS,
             subject: companyName + ': Active your account',
             text: text,
-            html: 'Hi! You have a pending invite request. <strong>' + text + '</strong>',
+            html: 'Hi! You have a pending invite request from <strong>' + companyName + '</strong>',
           };
          sgMail.send(msg);
          return res.status(200).send();
