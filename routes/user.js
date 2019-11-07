@@ -91,6 +91,26 @@ router.post("/user/login", async (req, res) => {
  
 });
 
+// logs a user out
+router.post("/user/logout", async (req, res) => {
+  const token = getToken(req.headers.authorization);    
+  var authenticated = await verifyToken(token); 
+  if (authenticated) {
+    // delete token  
+    user = User.updateOne({token: token}, {token: null}, function(err, u) {
+      if (err) {
+        return res.status(422).send({message: 'error'});
+      } else if (u) {
+        return res.status(200).send();
+      } else {
+        return res.status(404).send({message: 'invalid token'});
+      } 
+    }); 
+  } else {
+    return res.status(422).send({message: 'invalid token'});
+  } 
+});
+
 router.post("/user/invite", [
   check('email').isEmail()
 ], async (req, res) => {
