@@ -1,7 +1,10 @@
-# NOIRFest
-
+# NodeAPI
 This is a NodeJS Express 4.0 API that has an Nginx Reverse Proxy and runs all services inside a Docker Containers. 
+
 The static files are served through Nginx and Nginx proxies all requests to Express. 
+The static files are located in the Nginx container at /var/www, which is a virtual drive
+to local folder `static_files`. The best way to do so is to use a symbolic
+link to a folder for frontend content.
 
 ### Features
 * [x] Sets up Nginx as a reverse proxy to the node app.
@@ -50,3 +53,30 @@ The static files are served through Nginx and Nginx proxies all requests to Expr
   * `http --auth-type=jwt --auth=$token get 0.0.0.0/api/users`
 * Login 
   * `http post 0.0.0.0/api/user/login email=email@example.com password=password`
+
+### AWS S3
+Sample minimum Bucket policy
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObjectAcl",
+                "s3:GetObject",
+                "s3:CreateBucket",
+                "s3:PutObjectAcl"
+            ],
+            "Resource": [
+                "arn:aws:s3:::<bucketname>/*",
+                "arn:aws:s3:::<bucketname>"
+            ]
+        }
+    ]
+}
+
+
+#### S3 Direct Upload
+<a href="https://devcenter.heroku.com/articles/s3-upload-node#direct-uploading">Tutorial</a>

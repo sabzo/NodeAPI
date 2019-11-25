@@ -5,12 +5,12 @@ const bcrypt = require('bcrypt')
 //const initializePassport = require('../passport-config');
 const User = require('../models/user');
 
+// import routes
 router.use(require('./user'));
-router.use(require('./film'));
+router.use(require('./image'));
 
 router.get('/', function(req, res) {
   res.json({'success': true});
 });
-
 
 module.exports = router;
