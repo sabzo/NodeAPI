@@ -19,7 +19,6 @@ router.get('/img/i/:id', (req, res) => {
 /* Sign an image for s3 upload 
 ref: https://devcenter.heroku.com/articles/s3-upload-node */
 router.get('/img/s3_sign', [
-  check('file-name').exists(),
   check('file-type').exists()
   ], async (req, res) => {
   // validate results
@@ -29,11 +28,11 @@ router.get('/img/s3_sign', [
   }
   // make sure user is logged in
   const token = helpers.getToken(req.headers.authorization);
-  var authenticated = await verifyToken(token);
-  if (authenticated) {
-	  console.log('authenticated', authenticated);
+  var authenticatedUserID = await verifyToken(token);
+  if (authenticatedUserID) {
 	  const s3 = new aws.S3();
-	  const fileName = req.query['file-name'];
+	  //TODO Let filename be user + randomid
+	  const fileName = authenticatedUserID + Date.now() + shortid.generate();
 	  const fileType = req.query['file-type'];
 	  const s3Params = {
 	    Bucket: S3_BUCKET,
@@ -58,7 +57,6 @@ router.get('/img/s3_sign', [
   } else {
     return res.status(401).send({message: 'unauthorized'}); 
   }
- 
 });
 
 // Get images by user
@@ -67,6 +65,8 @@ router.get('/img/user', (req, res) => {
 
 /* Save image details */
 router.post('/save-details', (req, res) => {
+  //TODO Save filename under user DB 
+  // TODO New mongoose model for image
 });
 
 module.exports = router

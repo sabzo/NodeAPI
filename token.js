@@ -16,8 +16,8 @@ module.exports = async function(token) {
       }
     });
     // does token belong to a user?
-    var u = await User.findOne({token: token}).exec();
-    return (u.token == token); 
+    var u = await User.findOne({token: token}).exec(); 
+    return (u.token == token) ? u.id : false;
   } catch(e) {
     console.log('Error', e);
     return false;
