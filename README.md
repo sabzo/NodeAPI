@@ -53,6 +53,8 @@ link to a folder for frontend content.
   * `http --auth-type=jwt --auth=$token get 0.0.0.0/api/users`
 * Login 
   * `http post 0.0.0.0/api/user/login email=email@example.com password=password`
+* Contact Us
+  * `http post 0.0.0.0/api/contact_us email=from@example.com message=message-to-send`
 
 ### AWS S3
 Sample minimum Bucket policy

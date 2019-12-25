@@ -7,7 +7,7 @@ const { check, validationResult } = require('express-validator');
 const shortid = require('shortid');
 const sgMail = require('@sendgrid/mail');
 
-sgMail.setApiKey(process.env.SENDGRID_EMAIL_KEY);
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 function getToken(req) {
   return req == undefined || req.replace('Bearer ', '');
