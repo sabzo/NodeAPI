@@ -4,7 +4,7 @@ services:
     build:    
       context: .
       dockerfile: Dockerfile
-    image: noir_nodejs_12
+    image: nodejs_12_13
     container_name: nodejs
     restart: unless-stopped
     command: "node app.js"
@@ -21,15 +21,14 @@ services:
      - S3_BUCKET=${S3_BUCKET}
      - AWS_REGION=${AWS_REGION}
      - HOST=${HOST}
+     - PORT=${PORT}
     ports:
       - "8080:8080"
     depends_on:
       - mongo
-
   mongo:
     image: "mongo"
     container_name: mongo
-
   nginx:
     image: "nginx"
     container_name: nginx
