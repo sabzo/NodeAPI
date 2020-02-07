@@ -11,7 +11,7 @@ db.on('error', (error) => console.error(error))
 db.once('open', () => console.log('connected to database'))
 
 var app = express();
-app.set('port', process.env.port || 8080);
+app.set('port', process.env.PORT || 8080);
 
 // mongoose-session
 app.use(session({
@@ -21,7 +21,7 @@ app.use(session({
     store: new MongoStore({ 
          mongooseConnection: db, 
          ttl: 14 * 24 * 60 * 60
-    }) // TODO: Secret should come from environment variable
+    }) 
 }));
 
 // parse requests of content-type - application/x-www-form-urlencoded
