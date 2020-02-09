@@ -44,8 +44,10 @@ link to a folder for frontend content.
 ### Routes
 * Create a user
   * `http post 0.0.0.0/api/user/ email=email@example.com firstName=name1 password=password lastName=name2`
+* Login 
+  * `http post 0.0.0.0/api/user/login email=email@example.com password=password`
 * Invite User by email addres:
-  * `http --auth-type=jwt --auth=$token post 0.0.0.0/api/user/invite email=email@example.comI`
+  * `http --auth-type=jwt --auth=$token post 0.0.0.0/api/user/invite email=email@example.com firstName=<firstname>`
 * Create user from invite 
   * `http post 0.0.0.0/api/user/from_invite email=ownrepublic@gmail.com 
      inviteID=<invite-id> firstName=<name1> lastName=<name2> password=<password>`
@@ -53,8 +55,6 @@ link to a folder for frontend content.
   * `http --auth-type=jwt --auth=$token get 0.0.0.0/api/user/<userid>`
 * Retrieve all users
   * `http --auth-type=jwt --auth=$token get 0.0.0.0/api/users`
-* Login 
-  * `http post 0.0.0.0/api/user/login email=email@example.com password=password`
 * Contact Us
   * `http post 0.0.0.0/api/contact_us email=from@example.com message=message-to-send`
 

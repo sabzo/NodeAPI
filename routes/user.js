@@ -33,7 +33,7 @@ router.get('/user/:id', async (req, res) => {
 router.get('/users', async (req, res) => {
   const token = getToken(req.headers.authorization);
   var authenticated = await verifyToken(token); 
-  console.log('authenticated', authenticated);
+  //console.log('authenticated', authenticated);
   if (authenticated) {
   User.find({}, 'id firstName lastName', function(err, users) {
       if(err) {
@@ -67,7 +67,7 @@ router.post('/user', [
   var user = new User(req.body);
   user.save(function (err, u) {
     if (err) return console.log(err);
-    console.log(u);
+    // console.log(u);
     res.send({ok: 200});
   });
 });
@@ -112,7 +112,8 @@ router.post("/user/logout", async (req, res) => {
 });
 
 router.post("/user/invite", [
-  check('email').isEmail()
+  check('email').isEmail(),
+  check('firstName').exists(),
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -127,31 +128,37 @@ router.post("/user/invite", [
         console.log(err);
         return res.status(400).send({ message: "unable to find user" }); 
       } else {
+      // if email invite has been sent
         if (!user) {
-          const inviteID = shortid.generate();
-          const randomPassword = shortid.generate();
-          user = new User({email: req.body.email, inviteID: inviteID, password: randomPassword});
-          user.save();
-          const companyName = process.env.COMPANY_NAME;
-          const text = ': Click <a href="' + 
-          process.env.HOST + '?inviteID=' + inviteID + '"> here </a> to activate  your ' +  companyName + ' account';
-          const msg = {
-            to: req.body.email,
-            from: process.env.SENDGRID_EMAIL_ADDRESS,
-            subject: companyName + ': Active your account',
-            text: text,
-            html: 'Hi! You have a pending invite request from <strong>' + companyName + '</strong>',
-          };
-         sgMail.send(msg);
-         return res.status(200).send();
+					const companyName = process.env.COMPANY_NAME;
+					const inviteID = shortid.generate();
+					const text = 'Hi ' + req.body.firstName + '!: Click <a href="' + 
+					process.env.HOST + '?inviteID=' + inviteID + '"> here </a> to activate  your ' +  companyName + ' account';
+					const msg = {
+						to: req.body.email,
+						from: process.env.SENDGRID_EMAIL_ADDRESS,
+						subject: companyName + ': Active your account',
+						text: text,
+						html: text
+					};
+					const randomPassword = shortid.generate();
+					sgMail.send(msg).then(() => {
+						user = new User({email: req.body.email, inviteID: inviteID, password: randomPassword});
+						user.save(); 
+						return res.status(200).send();
+	        })
+					.catch(err => {
+						 console.error(err.toString());
+            console.log(message, code, response);
+            return res.status(400).send({message: "Unable to invite user"});
+					});
         } else {
           return res.status(400).send({ message: "Email already invited or exists" }); 
         }
-        
       }
     }); 
-    } else {
-      return res.status(401).send({message: 'unauthorized'}); 
+  } else {
+    return res.status(401).send({message: 'unauthorized'}); 
   }
 });
 
@@ -172,8 +179,6 @@ router.post("/user/from_invite", [
 
   user = User.findOne({inviteID: inviteID, email: email}, function(err, u) {
     if (err || !u) {
-       console.log(err);
-       console.log(u);
        return res.status(404).send({message: 'Invalid invite link'});  
      } else { 
        // update user
